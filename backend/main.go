@@ -1,6 +1,7 @@
 package main
 
 import (
+	"database/sql"
 	"fmt"
 	"log"
 	"net/http"
@@ -10,7 +11,7 @@ import (
 	"github.com/go-chi/chi"
 	"github.com/go-chi/cors"
 	"github.com/joho/godotenv"
-	_  "github.com/lib/pq"
+	_ "github.com/lib/pq"
 )
 
 type apiConfig struct {
@@ -35,7 +36,7 @@ func main() {
 		log.Fatal("Can't connect to database: ", err)
 	}
 	apiConfig := apiConfig{DB: database.New(connection)}
-	
+
 
 	
 	router := chi.NewRouter()
@@ -50,7 +51,9 @@ func main() {
 
 	v1Router := chi.NewRouter()
 	v1Router.Get("/test", handlerReadiness)
-	v1Router.Get("/error", handlerErr) 
+	v1Router.Get("/error", handlerErr)
+	v1Router.Post("/users", apiConfig.handlerCreateUser)
+
 
 	router.Mount("/v1", v1Router)
 
@@ -61,7 +64,7 @@ func main() {
 
 	log.Printf("Server starting on port %v", portString)
 
-	err := srv.ListenAndServe()
+	err = srv.ListenAndServe()
 	if err != nil {
 		log.Fatal(err)
 	}
