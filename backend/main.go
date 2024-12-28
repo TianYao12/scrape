@@ -6,10 +6,16 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/TianYao12/scraper/backend/internal/database"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/cors"
 	"github.com/joho/godotenv"
+	_  "github.com/lib/pq"
 )
+
+type apiConfig struct {
+	DB *database.Queries
+}
 
 func main() {
 	godotenv.Load()
@@ -19,6 +25,19 @@ func main() {
 		log.Fatal("PORT is an empty string")
 	}
 
+	dbURL := os.Getenv("DB_URL")
+	if dbURL == "" {
+		log.Fatal("DB_URL is not in the env file broski")
+	}
+
+	connection, err := sql.Open("postgres", dbURL)
+	if err != nil {
+		log.Fatal("Can't connect to database: ", err)
+	}
+	apiConfig := apiConfig{DB: database.New(connection)}
+	
+
+	
 	router := chi.NewRouter()
 	router.Use(cors.Handler(cors.Options{
 		AllowedOrigins:   []string{"https://*", "http://*"},
@@ -31,7 +50,7 @@ func main() {
 
 	v1Router := chi.NewRouter()
 	v1Router.Get("/test", handlerReadiness)
-	v1Router.Get("/error", handlerErr)
+	v1Router.Get("/error", handlerErr) 
 
 	router.Mount("/v1", v1Router)
 
