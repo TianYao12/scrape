@@ -115,3 +115,29 @@ func databasePostsToPosts(dbPosts []database.Post) []Post {
 	}
 	return posts
 }
+
+type Fireball struct {
+	ID                 uuid.UUID `json:"id"`
+	CreatedAt          time.Time `json:"created_at"`
+	UpdatedAt          time.Time `json:"updated_at"`
+	TotalRadiatedEnergy float64   `json:"total_radiated_energy"`
+	FeedID             uuid.UUID `json:"feed_id"`
+}
+
+func databaseFireballToFireball(dbFireball database.Fireball) Fireball {
+	return Fireball{
+		ID:                 dbFireball.ID,
+		CreatedAt:          dbFireball.CreatedAt,
+		UpdatedAt:          dbFireball.UpdatedAt,
+		TotalRadiatedEnergy: dbFireball.TotalRadiatedEnergy,
+		FeedID:             dbFireball.FeedID,
+	}
+}
+
+func databaseFireballsToFireballs(dbFireballs []database.Fireball) []Fireball {
+	fireballs := []Fireball{}
+	for _, dbFireball := range dbFireballs {
+		fireballs = append(fireballs, databaseFireballToFireball(dbFireball))
+	}
+	return fireballs
+}

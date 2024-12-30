@@ -50,3 +50,46 @@ func (apiConfig *apiConfig) handlerGetPostsForUser(w http.ResponseWriter, r *htt
 	}
 	respondWithJSON(w, 200, databasePostsToPosts(posts))
 }
+
+func (apiConfig *apiConfig) handlerCreateFireball(w http.ResponseWriter, r *http.Request) {
+	type parameters struct {
+		TotalRadiatedEnergy float64   `json:"total_radiated_energy"`
+		FeedID              uuid.UUID `json:"feed_id"`
+	}
+	decoder := json.NewDecoder(r.Body)
+
+	params := parameters{}
+	err := decoder.Decode(&params)
+	if err != nil {
+		respondWithError(w, 400, fmt.Sprintf("Error parsing JSON: %v", err))
+		return
+	}
+	fireball, err := apiConfig.DB.CreateFireball(r.Context(), database.CreateFireballParams{
+		ID:                 uuid.New(),
+		CreatedAt:          time.Now().UTC(),
+		UpdatedAt:          time.Now().UTC(),
+		TotalRadiatedEnergy: params.TotalRadiatedEnergy,
+		FeedID:             params.FeedID,
+	})
+	if err != nil {
+		respondWithError(w, 400, fmt.Sprintf("Couldn't create fireball: %v", err))
+		return
+	}
+	respondWithJSON(w, 201, databaseFireballToFireball(fireball))
+}
+
+func (apiConfig *apiConfig) handlerGetFireball(w http.ResponseWriter, r *http.Request, fireball database.Fireball) {
+	respondWithJSON(w, 200, databaseFireballToFireball(fireball))
+}
+
+func (apiConfig *apiConfig) handlerGetFireballsForUser(w http.ResponseWriter, r *http.Request, user database.User) {
+	fireballs, err := apiConfig.DB.GetFireballsForUser(r.Context(), database.GetFireballsForUserParams{
+		UserID: user.ID,
+		Limit:  10,
+	})
+	if err != nil {
+		respondWithError(w, 400, fmt.Sprintf("Couldn't get fireballs: %v", err))
+		return
+	}
+	respondWithJSON(w, 200, databaseFireballsToFireballs(fireballs))
+}
