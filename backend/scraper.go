@@ -31,7 +31,8 @@ func startScraping(
 		wg := &sync.WaitGroup{}
 		for _, feed := range feeds {
 			wg.Add(1)
-			go scrapeFeed(db, wg, feed)
+			// go scrapeFeed(db, wg, feed)
+			go scrapeFireballFeed(db, wg, feed)
 		}
 		wg.Wait()
 	}
@@ -83,4 +84,40 @@ func scrapeFeed(db *database.Queries, wg *sync.WaitGroup, feed database.Feed) {
 			}
 	}
 	log.Printf("Feed %s collected, %v posts foiunds", feed.Name, len(rssFeed.Channel.Item))
+}
+func scrapeFireballFeed(db *database.Queries, wg *sync.WaitGroup, feed database.Feed) {
+    defer wg.Done()
+
+    log.Printf("Fetching fireball feed: %v", feed.Url)
+
+    fireballFeed, err := urlToFireballFeed(feed.Url)
+    if err != nil {
+        log.Println("Error fetching fireball feed:", err)
+        return
+    }
+
+    log.Printf("Parsed rows: %d", len(fireballFeed))
+
+    for _, row := range fireballFeed {
+        if row.TotalRadiatedEnergyJ == 0 {
+            continue
+        }
+
+        _, err := db.CreateFireball(context.Background(), database.CreateFireballParams{
+            ID:                uuid.New(),
+            CreatedAt:         time.Now().UTC(),
+            UpdatedAt:         time.Now().UTC(),
+            TotalRadiatedEnergy: row.TotalRadiatedEnergyJ,
+            FeedID:            feed.ID,
+        })
+
+        if err != nil {
+            if strings.Contains(err.Error(), "duplicate key") {
+                continue
+            }
+            log.Println("Failed to create fireball record: ", err)
+        }
+    }
+
+    log.Printf("Fireball feed %s collected, %d rows found", feed.Name, len(fireballFeed))
 }

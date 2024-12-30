@@ -29,6 +29,14 @@ type FeedFollow struct {
 	FeedID    uuid.UUID
 }
 
+type Fireball struct {
+	ID                  uuid.UUID
+	CreatedAt           time.Time
+	UpdatedAt           time.Time
+	TotalRadiatedEnergy float64
+	FeedID              uuid.UUID
+}
+
 type Post struct {
 	ID          uuid.UUID
 	CreatedAt   time.Time

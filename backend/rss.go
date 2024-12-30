@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/xml"
+	"fmt"
 	"io"
 	"net/http"
 	"time"
@@ -23,6 +24,19 @@ type RSSItem struct {
 	Description	string	`xml:"description"`
 	PubDate		string	`xml:"pubDate"`
 }
+type FireballFeed struct {
+    OuterRows []OuterRow `xml:"row"`
+}
+
+type OuterRow struct {
+    Rows []FireballRow `xml:"row"`
+}
+
+type FireballRow struct {
+    TotalRadiatedEnergyJ float64 `xml:"total_radiated_energy_j"`
+}
+
+
 
 func urlToFeed(url string) (RSSFeed, error) {
 	httpClient := http.Client{
@@ -45,4 +59,24 @@ func urlToFeed(url string) (RSSFeed, error) {
 		return RSSFeed{}, err
 	}
 	return rssFeed, nil
+}
+
+func urlToFireballFeed(url string) ([]FireballRow, error) {
+    resp, err := http.Get(url)
+    if err != nil {
+        return nil, fmt.Errorf("failed to fetch URL: %w", err)
+    }
+    defer resp.Body.Close()
+
+    var feed FireballFeed
+    if err := xml.NewDecoder(resp.Body).Decode(&feed); err != nil {
+        return nil, fmt.Errorf("failed to decode XML: %w", err)
+    }
+
+    var rows []FireballRow
+    for _, outerRow := range feed.OuterRows {
+        rows = append(rows, outerRow.Rows...)
+    }
+
+    return rows, nil
 }

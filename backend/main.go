@@ -20,19 +20,12 @@ type apiConfig struct {
 }
 
 func main() {
-	feed, err := urlToFeed("https://wagslane.dev/index.xml")
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Print(feed)
-
 	godotenv.Load()
 
 	portString := os.Getenv("PORT")
 	if portString == "" {
 		log.Fatal("PORT is an empty string")
 	}
-
 	dbURL := os.Getenv("DB_URL")
 	if dbURL == "" {
 		log.Fatal("DB_URL is not in the env file broski")
@@ -42,7 +35,6 @@ func main() {
 	if err != nil {
 		log.Fatal("Can't connect to database: ", err)
 	}
-
 	db := database.New(connection)
 	apiConfig := apiConfig{DB: database.New(connection)}
 
