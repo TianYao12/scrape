@@ -1,17 +1,20 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
-interface FireballData {
-  id: string;
-  created_at: string;
-  feed_id: string;
-  updated_at: string;
-  total_radiated_energy: number
-}
+import { FireballData } from "@/lib/types";
+import FireballTable from "@/components/Table";
 
 export default function Home() {
   const [fireballData, setFireballData] = useState<FireballData[]>([]);
+  const [isTable, setIsTable] = useState<boolean>(true);
 
   useEffect(() => {
     const fetchFireballData = async () => {
@@ -22,7 +25,7 @@ export default function Home() {
             method: "GET",
             headers: {
               "Content-type": "application/json",
-              "Authorization": `${process.env.NEXT_PUBLIC_AUTH_KEY}`,
+              Authorization: `${process.env.NEXT_PUBLIC_AUTH_KEY}`,
             },
           }
         );
@@ -35,11 +38,34 @@ export default function Home() {
     fetchFireballData();
   }, []);
 
-  useEffect(()=> console.log(fireballData))
+  useEffect(() => console.log(fireballData));
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
+    <div className="flex items-center justify-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
       Fireball
-      <div>{fireballData.map((fireball, index) => <div key={`fireball-${index}`}>123</div>)}</div>
+      <div>
+        <Select onValueChange={(value) => {
+          setIsTable(value == "table")
+        }}>
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="Display" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="table">Table</SelectItem>
+            <SelectItem value="graph">Graph</SelectItem>
+          </SelectContent>
+        </Select>
+
+        {isTable ? (
+          <FireballTable data={fireballData}/>
+          // <div>
+          //   {fireballData.map((fireball, index) => (
+          //     <div key={`${fireball.id}-${index}`}>123</div>
+          //   ))}
+          // </div>
+        ) : (
+          <div></div>
+        )}
+      </div>
     </div>
   );
 }
