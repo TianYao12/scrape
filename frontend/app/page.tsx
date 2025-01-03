@@ -11,6 +11,8 @@ import {
 
 import { FireballData } from "@/lib/types";
 import FireballTable from "@/components/Table";
+import { Table } from "lucide-react";
+import Graph from "@/components/Graph";
 
 export default function Home() {
   const [fireballData, setFireballData] = useState<FireballData[]>([]);
@@ -40,12 +42,13 @@ export default function Home() {
 
   useEffect(() => console.log(fireballData));
   return (
-    <div className="flex items-center justify-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      Fireball
+    <div className="flex flex-col items-center justify-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
       <div>
-        <Select onValueChange={(value) => {
-          setIsTable(value == "table")
-        }}>
+        <Select
+          onValueChange={(value) => {
+            setIsTable(value == "table");
+          }}
+        >
           <SelectTrigger className="w-[180px]">
             <SelectValue placeholder="Display" />
           </SelectTrigger>
@@ -54,16 +57,12 @@ export default function Home() {
             <SelectItem value="graph">Graph</SelectItem>
           </SelectContent>
         </Select>
-
+      </div>
+      <div>
         {isTable ? (
-          <FireballTable data={fireballData}/>
-          // <div>
-          //   {fireballData.map((fireball, index) => (
-          //     <div key={`${fireball.id}-${index}`}>123</div>
-          //   ))}
-          // </div>
+          <FireballTable data={fireballData} />
         ) : (
-          <div></div>
+          <Graph data={fireballData} />
         )}
       </div>
     </div>
