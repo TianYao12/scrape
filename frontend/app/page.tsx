@@ -11,12 +11,11 @@ import {
 
 import { FireballData } from "@/lib/types";
 import FireballTable from "@/components/Table";
-import { Table } from "lucide-react";
 import Graph from "@/components/Graph";
 
 export default function Home() {
   const [fireballData, setFireballData] = useState<FireballData[]>([]);
-  const [isTable, setIsTable] = useState<boolean>(true);
+  const [isTable, setIsTable] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchFireballData = async () => {
@@ -40,7 +39,6 @@ export default function Home() {
     fetchFireballData();
   }, []);
 
-  useEffect(() => console.log(fireballData));
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
       <div>
@@ -50,7 +48,7 @@ export default function Home() {
           }}
         >
           <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Display" />
+            <SelectValue placeholder="Display Type" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="graph">Graph</SelectItem>
@@ -60,9 +58,9 @@ export default function Home() {
       </div>
       <div>
         {isTable ? (
-          <Graph data={fireballData} />
-        ) : (
           <FireballTable data={fireballData} />
+        ) : (
+          <Graph data={fireballData} />
         )}
       </div>
     </div>

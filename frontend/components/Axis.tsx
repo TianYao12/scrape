@@ -11,7 +11,7 @@ const Axis = ({
   width: number;
   height: number;
   margin: number;
-  xScale: ScaleBand<string>;
+  xScale: ScaleBand<number>;
   yScale: ScaleLinear<number, number, never>;
 
 }) => {
@@ -37,9 +37,9 @@ const Axis = ({
         tickLabelProps={{
           fontSize: 12,
           fill: "#545353",
-          textAnchor: "middle",
+          textAnchor: "start",
           fontFamily: "inherit",
-          dx: 18,
+          dx: 10,
         }}
       />
     </>

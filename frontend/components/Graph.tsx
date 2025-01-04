@@ -6,15 +6,15 @@ import { scaleLinear, scaleBand } from "@visx/scale";
 
 const Graph = (props: { data: FireballData[] }) => {
   const backgroundRef = useRef<HTMLDivElement>(null);
-  const width = backgroundRef?.current?.clientWidth || 0;
+  const width = (backgroundRef?.current?.clientWidth || 500);
   const height = backgroundRef?.current?.clientHeight || 0;
-  const margin = 30;
+  const margin = 120;
 
   const xScale = useMemo(
     () =>
-      scaleBand<string>({
+      scaleBand<number>({
         range: [0, width - margin],
-        domain: props.data.map((fireball) => fireball.id),
+        domain: props.data.map((fireball, index) => index),
         paddingOuter: 1,
       }),
     [width, props.data]
@@ -39,17 +39,14 @@ const Graph = (props: { data: FireballData[] }) => {
   );
 
   const chartData = useMemo(() => {
-    return props.data.map((fireball) => ({
-      x: (xScale(fireball.id) ?? 0) + xScale.bandwidth() / 2,
+    return props.data.map((fireball, index) => ({
+      x: (xScale(index) ?? 0) + xScale.bandwidth() / 2,
       y: yScale(fireball.total_radiated_energy),
     }));
   }, [props.data, xScale, yScale]);
 
   return (
-    <div
-      ref={backgroundRef}
-      className="relative w-[500px] h-[500px] cursor-crosshair"
-    >
+    <div ref={backgroundRef} className="w-[600px] h-[500px] cursor-crosshair">
       <svg width={width} height={height}>
         <rect x={0} y={0} width={width} height={height} fill="black" rx={10} />
         {chartData.map((point, index) => {
@@ -62,13 +59,13 @@ const Graph = (props: { data: FireballData[] }) => {
               y1={previousPoint.y}
               x2={point.x}
               y2={point.y}
-              stroke="red"
+              stroke="#0d91de"
               strokeWidth={2}
             />
           );
         })}
         {chartData?.map((data, i) => (
-          <circle key={i} cx={data.x} cy={data.y} r={3} fill="red" />
+          <circle key={i} cx={data.x} cy={data.y} r={3} fill="#0d91de" />
         ))}
         <Axis
           width={width}
