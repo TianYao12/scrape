@@ -53,16 +53,16 @@ export default function Home() {
             <SelectValue placeholder="Display" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="table">Table</SelectItem>
             <SelectItem value="graph">Graph</SelectItem>
+            <SelectItem value="table">Table</SelectItem>
           </SelectContent>
         </Select>
       </div>
       <div>
         {isTable ? (
-          <FireballTable data={fireballData} />
-        ) : (
           <Graph data={fireballData} />
+        ) : (
+          <FireballTable data={fireballData} />
         )}
       </div>
     </div>
